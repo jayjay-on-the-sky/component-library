@@ -4,9 +4,9 @@ import { cn } from '../../lib/utils'
 const variants = {
   default: 'bg-surface text-ink border-hairline',
   primary: 'bg-primary-muted text-primary border-transparent',
-  success: 'bg-green-50 text-success border-transparent',
-  warning: 'bg-amber-50 text-warning border-transparent',
-  error:   'bg-red-50 text-error border-transparent',
+  success: 'bg-success/10 text-success border-transparent',
+  warning: 'bg-warning/10 text-warning border-transparent',
+  error:   'bg-error/10 text-error border-transparent',
 }
 
 export default function Badge({
