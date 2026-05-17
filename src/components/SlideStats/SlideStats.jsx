@@ -23,7 +23,7 @@ export default function SlideStats({
     >
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 100%, rgba(99,102,241,0.15), transparent)' }} />
+        style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in srgb, var(--color-primary) 15%, transparent), transparent)' }} />
 
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
         <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-widest mb-2">
@@ -42,8 +42,8 @@ export default function SlideStats({
             className="flex flex-col"
           >
             <div className="text-6xl font-black text-primary mb-2" style={{ lineHeight: 1 }}>{s.value}</div>
-            <div className="font-semibold text-lg mb-1" style={{ color: dark ? 'rgba(255,255,255,0.9)' : 'var(--color-ink)' }}>{s.label}</div>
-            <div className="text-sm" style={{ color: dark ? 'rgba(255,255,255,0.4)' : 'var(--color-muted)' }}>{s.sub}</div>
+            <div className={cn('font-semibold text-lg mb-1', dark ? 'text-canvas/90' : 'text-ink')}>{s.label}</div>
+            <div className={cn('text-sm', dark ? 'text-canvas/40' : 'text-muted')}>{s.sub}</div>
           </motion.div>
         ))}
       </div>

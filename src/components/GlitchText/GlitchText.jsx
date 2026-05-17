@@ -44,22 +44,20 @@ const GlitchText = forwardRef(function GlitchText({
         {/* Base text */}
         <span>{children}</span>
 
-        {/* Glitch layer 1 (cyan shift) */}
+        {/* Glitch layer 1 (primary channel shift) */}
         <span
           aria-hidden="true"
-          className="absolute inset-0"
+          className="absolute inset-0 text-primary"
           style={{
-            color: '#00ffff',
             animation: `glitch-clip-1 ${duration} step-start infinite, glitch-shift-1 ${duration} step-start infinite`,
           }}
         >{children}</span>
 
-        {/* Glitch layer 2 (magenta shift) */}
+        {/* Glitch layer 2 (error channel shift) */}
         <span
           aria-hidden="true"
-          className="absolute inset-0"
+          className="absolute inset-0 text-error"
           style={{
-            color: '#ff00ff',
             animation: `glitch-clip-2 ${duration} step-start infinite, glitch-shift-2 ${duration} step-start infinite`,
           }}
         >{children}</span>

@@ -5,7 +5,7 @@ const SpotlightCard = forwardRef(function SpotlightCard({
   children,
   title,
   subtitle,
-  spotlightColor = 'rgba(99,102,241,0.15)',
+  spotlightColor = 'color-mix(in srgb, var(--color-primary) 15%, transparent)',
   className,
   ...props
 }, ref) {

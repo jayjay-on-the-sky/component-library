@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 function Card({ children, hover = false, className, ...props }) {
   return (
     <motion.div
-      whileHover={hover ? { y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.08)' } : {}}
+      whileHover={hover ? { y: -2, boxShadow: '0 8px 24px color-mix(in srgb, var(--color-ink) 8%, transparent)' } : {}}
       transition={{ duration: 0.15 }}
       className={cn(
         'bg-canvas border border-hairline rounded-[var(--radius-lg)] overflow-hidden',

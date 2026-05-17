@@ -18,7 +18,7 @@ export default function SlideCallToAction({
     >
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(99,102,241,0.2), transparent)' }} />
+        style={{ background: 'radial-gradient(ellipse 50% 60% at 50% 50%, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent)' }} />
 
       {/* Grid */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]"

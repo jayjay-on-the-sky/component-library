@@ -18,6 +18,10 @@ export {
   ScanLine,
   ScanSearch,
   ScanBarcode,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowUpLeft,
+  ArrowDownLeft,
   ChevronDown,
   ChevronUp,
   ChevronLeft,
@@ -75,6 +79,8 @@ export {
   Pin,
   Lock,
   Unlock,
+  LogIn,
+  LogOut,
   Eye,
   EyeOff,
   Maximize,
@@ -166,6 +172,10 @@ export {
   Phone,
   PhoneCall,
   PhoneOff,
+  Smartphone,
+  Tablet,
+  Monitor,
+  Laptop,
   AtSign,
   Inbox,
 
@@ -211,6 +221,12 @@ export {
   GitMerge,
   GitPullRequest,
   Package,
+  Github,
+
+  // ── Social & Brand ───────────────────────────────────────────────────────────
+  Twitter,
+  Linkedin,
+  Chrome,
 
   // ── Settings & Config ────────────────────────────────────────────────────────
   Settings,
