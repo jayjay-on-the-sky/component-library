@@ -1,0 +1,154 @@
+/* ─── Google Fonts (must come before @import "tailwindcss") ── */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+/* ─── Design Token Layer ────────────────────────────────────── */
+/* These vars are the single source of truth for all theming.
+   They are overwritten at :root when a design.md theme is loaded.
+   Components use Tailwind's --color-* references (defined in @theme below).
+   The shell chrome (sidebar, topbar) uses the --shell-* vars which
+   are intentionally kept separate so the shell stays dark regardless
+   of the active component theme. */
+
+:root {
+  /* ── Shell chrome (always dark, never overridden by design.md) ── */
+  --shell-bg:          #0a0a0a;
+  --shell-sidebar:     #111111;
+  --shell-border:      #1f1f1f;
+  --shell-surface:     #1a1a1a;
+  --shell-text:        #e4e4e7;
+  --shell-text-muted:  #71717a;
+  --shell-accent:      #6366f1;
+  --shell-accent-hover:#4f46e5;
+
+  /* ── Component theme tokens (swapped when design.md is loaded) ── */
+  --color-primary:         #6366f1;
+  --color-primary-hover:   #4f46e5;
+  --color-primary-active:  #4338ca;
+  --color-primary-muted:   #eef2ff;
+  --color-canvas:          #ffffff;
+  --color-surface:         #f4f4f5;
+  --color-surface-strong:  #e4e4e7;
+  --color-ink:             #09090b;
+  --color-ink-muted:       #3f3f46;
+  --color-body:            #52525b;
+  --color-muted:           #a1a1aa;
+  --color-hairline:        #e4e4e7;
+  --color-on-primary:      #ffffff;
+  --color-success:         #16a34a;
+  --color-warning:         #d97706;
+  --color-error:           #dc2626;
+
+  /* ── Radius scale ── */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
+
+  /* ── Typography ── */
+  --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ─── Tailwind v4 Theme Registration ───────────────────────── */
+@theme {
+  --color-primary:        var(--color-primary);
+  --color-primary-hover:  var(--color-primary-hover);
+  --color-primary-active: var(--color-primary-active);
+  --color-primary-muted:  var(--color-primary-muted);
+  --color-canvas:         var(--color-canvas);
+  --color-surface:        var(--color-surface);
+  --color-surface-strong: var(--color-surface-strong);
+  --color-ink:            var(--color-ink);
+  --color-ink-muted:      var(--color-ink-muted);
+  --color-body:           var(--color-body);
+  --color-muted:          var(--color-muted);
+  --color-hairline:       var(--color-hairline);
+  --color-on-primary:     var(--color-on-primary);
+  --color-success:        var(--color-success);
+  --color-warning:        var(--color-warning);
+  --color-error:          var(--color-error);
+
+  --color-shell-bg:          var(--shell-bg);
+  --color-shell-sidebar:     var(--shell-sidebar);
+  --color-shell-border:      var(--shell-border);
+  --color-shell-surface:     var(--shell-surface);
+  --color-shell-text:        var(--shell-text);
+  --color-shell-text-muted:  var(--shell-text-muted);
+  --color-shell-accent:      var(--shell-accent);
+
+  --font-family-sans: var(--font-sans);
+  --font-family-mono: var(--font-mono);
+
+  --radius-xs:   var(--radius-xs);
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+  --radius-full: var(--radius-full);
+}
+
+/* ─── Base Styles ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--shell-bg);
+  color: var(--shell-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--shell-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--shell-text-muted); }
+
+/* ─── Preview canvas dot grid ───────────────────────────────── */
+.preview-grid {
+  background-color: var(--color-canvas);
+  background-image: radial-gradient(var(--color-hairline) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* ─── Syntax highlight theme (VS Code Dark+) ─────────────────── */
+.token-keyword   { color: #569cd6; }
+.token-string    { color: #ce9178; }
+.token-comment   { color: #6a9955; font-style: italic; }
+.token-function  { color: #dcdcaa; }
+.token-number    { color: #b5cea8; }
+.token-operator  { color: #d4d4d4; }
+.token-punctuation { color: #d4d4d4; }
+.token-tag       { color: #4ec9b0; }
+.token-attr-name { color: #9cdcfe; }
+.token-attr-value { color: #ce9178; }
+.token-class-name { color: #4ec9b0; }
+
+/* ─── Shimmer animation for Skeleton ────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-strong) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ─── Focus ring ────────────────────────────────────────────── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
