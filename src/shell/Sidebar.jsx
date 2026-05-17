@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../lib/utils'
+import { Search } from '../lib/icons'
 
 export default function Sidebar({ registry, selected, onSelect }) {
   const { components, categories, query, setQuery } = registry
@@ -17,13 +18,11 @@ export default function Sidebar({ registry, selected, onSelect }) {
       {/* Search */}
       <div className="p-3 border-b border-shell-border">
         <div className="relative">
-          <svg
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-shell-text-muted"
-            width="12" height="12" viewBox="0 0 12 12" fill="none"
-          >
-            <circle cx="5" cy="5" r="4" stroke="currentColor" strokeWidth="1.3"/>
-            <path d="M8.5 8.5l2 2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-          </svg>
+          <Search
+            size={12}
+            strokeWidth={1.7}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-shell-text-muted pointer-events-none"
+          />
           <input
             type="text"
             placeholder="Search..."

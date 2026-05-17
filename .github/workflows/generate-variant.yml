@@ -1,0 +1,63 @@
+name: Generate Theme Variant
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_tokens:
+        description: 'JSON string of base color token map'
+        required: true
+        type: string
+      variant_description:
+        description: 'Plain-English description of the variant (e.g. "dark mode", "warm earthy tones")'
+        required: true
+        type: string
+      variant_label:
+        description: 'Short label for the variant tab'
+        required: true
+        type: string
+      theme_name:
+        description: 'Name of the base theme (used for file naming)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    name: Generate "${{ inputs.variant_label }}" variant
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install node-fetch@3
+
+      - name: Generate variant
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          node .github/scripts/generate-variant.js \
+            '${{ inputs.base_tokens }}' \
+            "${{ inputs.variant_description }}" \
+            "${{ inputs.variant_label }}" \
+            "${{ inputs.theme_name }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "CompLib Bot"
+          git config user.email "complib-bot@users.noreply.github.com"
+          git add themes/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "feat(theme): add ${{ inputs.variant_label }} variant for ${{ inputs.theme_name }}"
+            git push
+          fi

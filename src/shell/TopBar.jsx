@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { cn } from '../lib/utils'
+import { Plus, Palette, ScanLine, LayoutGrid } from '../lib/icons'
 
 export default function TopBar({ onToggleTheme, onOpenCreate, onOpenScan, themeName, showTheme }) {
   return (
@@ -7,12 +8,7 @@ export default function TopBar({ onToggleTheme, onOpenCreate, onOpenScan, themeN
       {/* Brand */}
       <div className="flex items-center gap-2.5">
         <div className="w-6 h-6 rounded-md bg-shell-accent flex items-center justify-center">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="1" y="1" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-            <rect x="8" y="1" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
-            <rect x="1" y="8" width="5" height="5" rx="1" fill="white" opacity="0.6"/>
-            <rect x="8" y="8" width="5" height="5" rx="1" fill="white" opacity="0.3"/>
-          </svg>
+          <LayoutGrid size={13} className="text-white" strokeWidth={1.8} />
         </div>
         <span className="text-sm font-semibold text-shell-text tracking-tight">CompLib</span>
         <span className="text-xs text-shell-text-muted font-mono hidden sm:block">v0.1</span>
@@ -27,7 +23,7 @@ export default function TopBar({ onToggleTheme, onOpenCreate, onOpenScan, themeN
         )}
 
         <TopBarButton onClick={onOpenScan} title="Scan URL or image">
-          <ScanIcon />
+          <ScanLine size={13} strokeWidth={1.7} />
           <span className="hidden sm:block">Scan</span>
         </TopBarButton>
 
@@ -36,7 +32,7 @@ export default function TopBar({ onToggleTheme, onOpenCreate, onOpenScan, themeN
           active={showTheme}
           title="Load design.md theme"
         >
-          <ThemeIcon />
+          <Palette size={13} strokeWidth={1.7} />
           <span className="hidden sm:block">Theme</span>
         </TopBarButton>
 
@@ -45,9 +41,7 @@ export default function TopBar({ onToggleTheme, onOpenCreate, onOpenScan, themeN
           whileTap={{ scale: 0.96 }}
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-shell-accent text-white rounded-md hover:bg-shell-accent-hover transition-colors"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
+          <Plus size={12} strokeWidth={2} />
           Create
         </motion.button>
       </div>
@@ -73,22 +67,3 @@ function TopBarButton({ children, onClick, active, title }) {
   )
 }
 
-function ThemeIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-      <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" strokeWidth="1.2"/>
-      <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.4"/>
-    </svg>
-  )
-}
-
-function ScanIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-      <rect x="1" y="1" width="4" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-      <rect x="8" y="1" width="4" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-      <rect x="1" y="8" width="4" height="4" rx="1" stroke="currentColor" strokeWidth="1.2"/>
-      <path d="M8 10.5h4M10 8.5v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    </svg>
-  )
-}

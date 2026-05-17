@@ -1,24 +1,61 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { generateFromScan } from '../lib/componentAgent'
+import { motion, AnimatePresence } from 'framer-motion'
+import { runWorkflow, isConfigured, getRepoUrl } from '../lib/githubClient'
+
+function toPascalCase(str) {
+  return str
+    .replace(/https?:\/\/[^\s]*/g, '') // strip URL
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join('')
+}
+
+const CATEGORIES = ['Display', 'Forms', 'Navigation', 'Feedback', 'Layout', 'Sections']
 
 export default function ScanModal({ onClose }) {
   const [input, setInput] = useState('')
+  const [componentName, setComponentName] = useState('')
+  const [category, setCategory] = useState('Display')
   const [status, setStatus] = useState('idle')
-  const [result, setResult] = useState(null)
+  const [log, setLog] = useState([])
   const [error, setError] = useState('')
+  const configured = isConfigured()
+
+  const addLog = msg => setLog(prev => [...prev, msg])
+  const isURL = input.trim().startsWith('http')
+  const derivedName = componentName || (isURL ? '' : toPascalCase(input)) || 'ExtractedComponent'
 
   const handleScan = async () => {
     if (!input.trim()) return
-    setStatus('loading')
+    setStatus('waiting')
+    setLog([])
     setError('')
+
     try {
-      const res = await generateFromScan(input.trim())
-      setResult(res)
-      setStatus('done')
+      addLog('Dispatching scan workflow…')
+      const { success, conclusion } = await runWorkflow(
+        'scan-component.yml',
+        {
+          source: input.trim(),
+          component_name: derivedName,
+          category,
+        },
+        { onLog: addLog, intervalMs: 5000, timeoutMs: 180_000 }
+      )
+
+      if (success) {
+        setStatus('done')
+        addLog(`✓ ${derivedName} committed to repo`)
+      } else {
+        setStatus('error')
+        setError(`Workflow ended with: ${conclusion}`)
+      }
     } catch (e) {
-      setError(e.message)
       setStatus('error')
+      setError(e.message)
     }
   }
 
@@ -44,7 +81,7 @@ export default function ScanModal({ onClose }) {
           <div>
             <h2 className="text-sm font-semibold text-shell-text">Scan & Extract</h2>
             <p className="text-[11px] text-shell-text-muted mt-0.5">
-              Paste a URL or describe a UI to extract a component
+              Paste a URL or describe a UI — Claude reverse-engineers the component
             </p>
           </div>
           <button onClick={onClose} className="text-shell-text-muted hover:text-shell-text p-1 transition-colors">
@@ -54,7 +91,13 @@ export default function ScanModal({ onClose }) {
           </button>
         </div>
 
-        <div className="p-5">
+        <div className="p-5 space-y-3">
+          {!configured && (
+            <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-[11px] text-yellow-400">
+              ⚠ GitHub env vars not set. Add VITE_GITHUB_TOKEN, VITE_GITHUB_OWNER, VITE_GITHUB_REPO to .env
+            </div>
+          )}
+
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -63,26 +106,68 @@ export default function ScanModal({ onClose }) {
             className="w-full px-3 py-2.5 text-sm bg-shell-surface border border-shell-border rounded-lg text-shell-text placeholder-shell-text-muted focus:outline-none focus:border-shell-accent resize-none transition-colors"
           />
 
-          {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+          {isURL && (
+            <p className="text-[11px] text-shell-text-muted -mt-1">
+              🔗 URL detected — Claude will analyze the page visually
+            </p>
+          )}
 
-          {status === 'done' && result && (
+          {/* Name + category */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder={`Name (${derivedName})`}
+              value={componentName}
+              onChange={e => setComponentName(e.target.value)}
+              className="flex-1 px-3 py-2 text-xs bg-shell-surface border border-shell-border rounded-lg text-shell-text placeholder-shell-text-muted focus:outline-none focus:border-shell-accent transition-colors"
+            />
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="px-3 py-2 text-xs bg-shell-surface border border-shell-border rounded-lg text-shell-text focus:outline-none focus:border-shell-accent transition-colors"
+            >
+              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Log */}
+          <AnimatePresence>
+            {log.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="rounded-lg border border-shell-border bg-shell-surface overflow-hidden"
+              >
+                <div className="px-3 py-2 space-y-1 max-h-32 overflow-y-auto font-mono text-[11px] text-shell-text-muted">
+                  {log.map((l, i) => <div key={i}>{l}</div>)}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {error && <p className="text-xs text-red-400">{error}</p>}
+
+          {status === 'done' && (
             <motion.div
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 rounded-lg border border-green-500/20 bg-green-500/5 p-3"
+              className="rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2.5"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-green-400">✓ {result.name} extracted</span>
-                <button
-                  onClick={() => navigator.clipboard.writeText(result.jsx)}
-                  className="text-[11px] text-shell-text-muted hover:text-shell-text transition-colors"
-                >
-                  Copy JSX
-                </button>
-              </div>
-              <p className="text-[11px] text-shell-text-muted mt-1">
-                Category: {result.category} · Copy the code and save it to your components folder.
+              <p className="text-xs font-medium text-green-400 mb-1">
+                ✓ {derivedName} committed to repository
               </p>
+              <p className="text-[11px] text-shell-text-muted">
+                Vercel will redeploy automatically. Reload the app in ~30s.
+              </p>
+              <a
+                href={`${getRepoUrl()}/actions`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block mt-1 text-[11px] text-shell-accent hover:underline"
+              >
+                View run on GitHub →
+              </a>
             </motion.div>
           )}
         </div>
@@ -94,16 +179,16 @@ export default function ScanModal({ onClose }) {
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={handleScan}
-            disabled={status === 'loading' || !input.trim()}
+            disabled={['waiting', 'running'].includes(status) || !input.trim() || !configured}
             className="flex items-center gap-2 px-4 py-1.5 text-xs font-medium bg-shell-accent text-white rounded-md hover:bg-shell-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            {status === 'loading' ? (
+            {['waiting', 'running'].includes(status) ? (
               <>
                 <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}/>
                 <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}/>
                 <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}/>
               </>
-            ) : 'Scan'}
+            ) : 'Scan via GitHub'}
           </motion.button>
         </div>
       </motion.div>

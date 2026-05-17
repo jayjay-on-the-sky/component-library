@@ -4,26 +4,41 @@
  *   - components: array of { name, category, description, variants, Component, source }
  *   - categories: unique sorted list of category strings
  *   - search(query): filters components by name/description
+ *
+ * Meta files:
+ *   - *.meta.js  — plain JS, no JSX (simple components)
+ *   - *.meta.jsx — contains JSX (demo wrappers, compound previews)
+ * Both are eagerly imported and merged into the same registry.
  */
 
 import { useMemo, useState } from 'react'
 
-// Eagerly import all meta files
-const metaModules = import.meta.glob('../components/**/*.meta.js', { eager: true })
-// Eagerly import all component files as modules (for live render)
+// ── Meta discovery: both .meta.js and .meta.jsx ────────────────────────────
+const metaModulesJs  = import.meta.glob('../components/**/*.meta.js',  { eager: true })
+const metaModulesJsx = import.meta.glob('../components/**/*.meta.jsx', { eager: true })
+
+// ── Component modules (for live render) ───────────────────────────────────
 const compModules = import.meta.glob('../components/**/*.jsx', { eager: true })
-// Import source as raw strings (for code panel)
-const rawModules = import.meta.glob('../components/**/*.jsx', { eager: true, query: '?raw', import: 'default' })
+
+// ── Raw source strings (for code panel) ───────────────────────────────────
+const rawModules = import.meta.glob('../components/**/*.jsx', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+})
+
+// Merge both meta glob maps
+const allMetaModules = { ...metaModulesJs, ...metaModulesJsx }
 
 function buildRegistry() {
-  return Object.entries(metaModules).map(([metaPath, metaMod]) => {
+  return Object.entries(allMetaModules).map(([metaPath, metaMod]) => {
     const meta = metaMod.default
 
-    // Derive component path from meta path: .../Button/Button.meta.js → .../Button/Button.jsx
-    const compPath = metaPath.replace('.meta.js', '.jsx')
+    // Resolve the matching .jsx component file
+    // handles both .meta.js → .jsx and .meta.jsx → .jsx
+    const compPath = metaPath.replace(/\.meta\.(js|jsx)$/, '.jsx')
     const compMod = compModules[compPath]
     const Component = compMod?.default ?? null
-
     const source = rawModules[compPath] ?? ''
 
     return {

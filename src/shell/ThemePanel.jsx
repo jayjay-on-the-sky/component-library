@@ -1,11 +1,37 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { parseDesignMd } from '../lib/designMdParser'
 import VariantGenerator from './VariantGenerator'
+import { loadAllThemes, isConfigured } from '../lib/githubClient'
 
 export default function ThemePanel({ theme, onClose }) {
   const fileRef = useRef(null)
   const { themeState, loadTheme, applyVariant, resetTheme, error } = theme
+  const [loadingRemote, setLoadingRemote] = useState(false)
+  const [remoteError, setRemoteError] = useState('')
+  const [remoteThemes, setRemoteThemes] = useState([])
+
+  const handleLoadFromGitHub = async () => {
+    setLoadingRemote(true)
+    setRemoteError('')
+    try {
+      const themes = await loadAllThemes()
+      setRemoteThemes(themes)
+    } catch (e) {
+      setRemoteError(e.message)
+    } finally {
+      setLoadingRemote(false)
+    }
+  }
+
+  const applyRemoteTheme = (t) => {
+    // Convert token map to a mini design.md string and load it
+    const lines = Object.entries(t.tokens)
+      .map(([k, v]) => `\`{colors.${k}}\` — ${v}`)
+      .join('\n')
+    const md = `# ${t.theme} — ${t.variant}\n\n## Colors\n\n${lines}\n`
+    loadTheme(md)
+  }
 
   const handleFile = (e) => {
     const file = e.target.files?.[0]
@@ -55,6 +81,35 @@ export default function ThemePanel({ theme, onClose }) {
           Load design.md
         </button>
         {error && <p className="text-[11px] text-red-400 mt-1.5">{error}</p>}
+
+        {/* Load from GitHub */}
+        {isConfigured() && (
+          <div className="mt-1.5">
+            <button
+              onClick={handleLoadFromGitHub}
+              disabled={loadingRemote}
+              className="w-full py-1.5 text-[11px] font-medium border border-shell-border rounded-lg text-shell-text-muted hover:text-shell-text hover:border-shell-accent/50 transition-colors disabled:opacity-50"
+            >
+              {loadingRemote ? 'Loading…' : '↓ Load from GitHub'}
+            </button>
+            {remoteError && <p className="text-[11px] text-red-400 mt-1">{remoteError}</p>}
+            {remoteThemes.length > 0 && (
+              <div className="mt-1.5 space-y-1">
+                {remoteThemes.map((t, i) => (
+                  <button
+                    key={i}
+                    onClick={() => applyRemoteTheme(t)}
+                    className="w-full flex items-center justify-between px-2.5 py-1.5 text-[11px] rounded-md border border-shell-border text-shell-text-muted hover:text-shell-text hover:bg-shell-surface transition-colors"
+                  >
+                    <span className="font-medium">{t.theme}</span>
+                    <span className="opacity-60">{t.variant}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {themeState.base && (
           <button
             onClick={resetTheme}

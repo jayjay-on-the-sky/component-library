@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Copy, Check } from '../lib/icons'
 
 /**
  * Minimal syntax highlighter — applies token classes via regex substitution.
@@ -44,17 +45,12 @@ export default function CodePanel({ source, componentName }) {
         >
           {copied ? (
             <>
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                <path d="M1.5 5.5l3 3 5-5.5" stroke="#4ade80" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Check size={11} strokeWidth={2.2} className="text-green-400" />
               <span className="text-green-400">Copied!</span>
             </>
           ) : (
             <>
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                <rect x="3.5" y="1" width="6.5" height="7.5" rx="1" stroke="currentColor" strokeWidth="1.1"/>
-                <path d="M1 3.5v6.5h6.5" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <Copy size={11} strokeWidth={1.6} />
               Copy
             </>
           )}
