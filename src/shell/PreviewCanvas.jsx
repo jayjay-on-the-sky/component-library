@@ -85,6 +85,8 @@ export default function PreviewCanvas({ component, theme }) {
             >
               {/* Variant can supply its own Component (demo wrapper) or use the default */}
               {(() => {
+                // variant.demo = raw JSX node (for stateful demos like dialogs)
+                if (variant.demo) return variant.demo
                 const RenderComponent = variant.Component ?? Component
                 return RenderComponent ? (
                   <RenderComponent {...(variant.props ?? {})} />
