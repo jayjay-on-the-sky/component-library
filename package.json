@@ -1,8 +1,12 @@
 {
-  "name": "component-library",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@jayjay/component-library",
+  "version": "0.1.0",
   "type": "module",
+  "exports": {
+    "./components/*": "./src/components/*",
+    "./lib/*": "./src/lib/*",
+    "./index.css": "./src/index.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
